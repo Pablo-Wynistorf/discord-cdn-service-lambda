@@ -37,7 +37,7 @@ npm install --prefix ./src
 # Set variables
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 RANDOM_STRING=$(openssl rand -base64 6 | tr -dc 'a-z0-9' | head -c 6)
-S3_BUCKET_NAME="discordcdnservicelambda-$ACCOUNT_ID-$RANDOM_STRING"
+S3_BUCKET_NAME="discordcdnservicelambda-$ACCOUNT_ID-$AWS_DEFAULT_REGION-$RANDOM_STRING"
 
 # Create the S3 bucket
 echo "Creating S3 bucket: $S3_BUCKET_NAME"

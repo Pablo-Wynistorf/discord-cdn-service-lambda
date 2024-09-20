@@ -8,13 +8,14 @@ git clone https://github.com/Pablo-Wynistorf/discord-cdn-service-lambda.git
 cd discord-cdn-service-lambda
 ```
 
-Automatic Deployment:
+### Automatic Deployment:
 ```bash
 chmod +x deploy.sh
 ./deploy.sh
 ```
 
 
+### Manual Deployment:
 Install node modules:
 ```bash
 npm install --prefix ./src
@@ -47,7 +48,7 @@ sam deploy --template-file template.yml \
   --parameter-overrides DiscordBotToken=$DISCORD_BOT_TOKEN DiscordChannelId=$DISCORD_CHANNEL_ID
 ```
 
-## Cleanup
+## Cleanup:
 
 Just run these two commands:
 

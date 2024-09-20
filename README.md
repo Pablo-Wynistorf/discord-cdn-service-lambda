@@ -8,6 +8,13 @@ git clone https://github.com/Pablo-Wynistorf/discord-cdn-service-lambda.git
 cd discord-cdn-service-lambda
 ```
 
+Automatic Deployment:
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+
 Install node modules:
 ```bash
 npm install --prefix ./src

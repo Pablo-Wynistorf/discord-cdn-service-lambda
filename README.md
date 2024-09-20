@@ -4,8 +4,8 @@
 
 Clone this repo:
 ```bash
-git clone https://github.com/Pablo-Wynistorf/url-restream.git
-cd url-restream
+git clone https://github.com/Pablo-Wynistorf/discord-cdn-service-lambda.git
+cd discord-cdn-service-lambda
 ```
 
 Install node modules:

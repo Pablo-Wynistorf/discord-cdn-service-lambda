@@ -1,10 +1,25 @@
 #!/bin/bash
 
 # Input Fields
-read -p "Do you have the aws cli, sam cli, npm and git installed? (y/n): " HAS_DEPENDENCIES
+
+# Check if the AWS CLI is installed
+if ! [ -x "$(command -v aws)" ]; then
+  HAS_DEPENDENCIES="n"
+fi
+
+# Check if the SAM CLI is installed
+if ! [ -x "$(command -v sam)" ]; then
+  HAS_DEPENDENCIES="n"
+fi
+
+# Check if npm is installed
+if ! [ -x "$(command -v npm)" ]; then
+  HAS_DEPENDENCIES="n"
+fi
+
 
 if [ "$HAS_DEPENDENCIES" != "y" ]; then
-  echo "Please install the AWS CLI, SAM CLI, and Git before running this script."
+  echo "Please install the AWS CLI, SAM CLI, and npm before running this script."
   exit 1
 fi
 

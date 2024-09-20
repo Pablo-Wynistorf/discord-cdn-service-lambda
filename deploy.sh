@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Input Fields
-
 HAS_DEPENDENCIES="y"
 
 # Check if the AWS CLI is installed

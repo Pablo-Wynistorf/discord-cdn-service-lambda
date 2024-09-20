@@ -31,7 +31,7 @@ AWS_DEFAULT_REGION="us-east-1"
 
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 RANDOM_STRING=$(openssl rand -base64 6 | tr -dc 'a-z0-9' | head -c 6)
-S3_BUCKET_NAME="discordcdnservicelambda-$ACCOUNT_ID-$AWS_DEFAULT_REGION-$RANDOM_STRING"
+S3_BUCKET_NAME="discordcdnservicelambda-$ACCOUNT_ID-${AWS_DEFAULT_REGION//-/}-$RANDOM_STRING"
 
 DISCORD_BOT_TOKEN="token"
 DISCORD_CHANNEL_ID="id"
@@ -57,7 +57,7 @@ Just run these two commands:
 AWS_DEFAULT_REGION="us-east-1"
 
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-S3_BUCKET_NAME=$(aws s3api list-buckets --query "Buckets[?starts_with(Name, \`discordcdnservicelambda-${ACCOUNT_ID}-${AWS_DEFAULT_REGION}-\`)].Name" --output text)
+S3_BUCKET_NAME=$(aws s3api list-buckets --query "Buckets[?starts_with(Name, \`discordcdnservicelambda-${ACCOUNT_ID}-${AWS_DEFAULT_REGION//-/}-\`)].Name" --output text)
 
 # Delete SAM Stack
 aws cloudformation delete-stack --stack-name discordCDNServiceLambdaStack --region $AWS_DEFAULT_REGION

@@ -2,6 +2,8 @@
 
 # Input Fields
 
+HAS_DEPENDENCIES="y"
+
 # Check if the AWS CLI is installed
 if ! [ -x "$(command -v aws --version)" ]; then
   HAS_DEPENDENCIES="n"

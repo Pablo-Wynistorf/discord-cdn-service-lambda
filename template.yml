@@ -39,45 +39,7 @@ Resources:
             Path: /{proxy+}
             Method: ANY
 
-  CloudFrontDistribution:
-    Type: AWS::CloudFront::Distribution
-    Properties: 
-      DistributionConfig: 
-        Enabled: true
-        DefaultCacheBehavior: 
-          TargetOriginId: ApiGatewayOrigin
-          ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods: 
-            - GET
-            - HEAD
-            - OPTIONS
-            - PUT
-            - POST
-            - PATCH
-            - DELETE
-          CachedMethods:
-            - GET
-            - HEAD
-          ForwardedValues: 
-            QueryString: true
-            Cookies: 
-              Forward: none
-          DefaultTTL: 31557600
-          MaxTTL: 31557600
-          MinTTL: 31557600
-        Origins: 
-          - Id: ApiGatewayOrigin
-            DomainName: !Sub "${DiscordCDNServiceLambdaAPI}.execute-api.${AWS::Region}.amazonaws.com"
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-        ViewerCertificate: 
-          CloudFrontDefaultCertificate: true
-
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL for the default stage"
     Value: !Sub "https://${DiscordCDNServiceLambdaAPI}.execute-api.${AWS::Region}.amazonaws.com/"
-
-  CloudFrontUrl:
-    Description: "CloudFront Distribution URL"
-    Value: !Sub "https://${CloudFrontDistribution.DomainName}"

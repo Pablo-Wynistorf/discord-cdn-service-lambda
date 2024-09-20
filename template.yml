@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Free CDN Service hosted on AWS with Discord backend
+
+Parameters:
+  DiscordBotToken:
+    Type: String
+    Description: "Discord Bot Token"
+  DiscordChannelId:
+    Type: String
+    Description: "Discord Channel ID"
+
+Resources:
+  DiscordCDNServiceLambdaAPI:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: DiscordCDNServiceLambda
+
+  DiscordCDNServiceLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: DiscordCDNServiceLambda
+      Handler: index.handler
+      Runtime: nodejs20.x
+      CodeUri: ./src
+      Environment:
+        Variables:
+          DISCORD_BOT_TOKEN: !Ref DiscordBotToken
+          DISCORD_CHANNEL_ID: !Ref DiscordChannelId
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref DiscordCDNServiceLambdaAPI
+            Path: /{proxy+}
+            Method: ANY
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties: 
+      DistributionConfig: 
+        Enabled: true
+        DefaultCacheBehavior: 
+          TargetOriginId: ApiGatewayOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: 
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          CachedMethods:
+            - GET
+            - HEAD
+          ForwardedValues: 
+            QueryString: true
+            Cookies: 
+              Forward: none
+          DefaultTTL: 31557600
+          MaxTTL: 31557600
+          MinTTL: 31557600
+        Origins: 
+          - Id: ApiGatewayOrigin
+            DomainName: !Sub "${DiscordCDNServiceLambdaAPI}.execute-api.${AWS::Region}.amazonaws.com"
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+        ViewerCertificate: 
+          CloudFrontDefaultCertificate: true
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL for the default stage"
+    Value: !Sub "https://${DiscordCDNServiceLambdaAPI}.execute-api.${AWS::Region}.amazonaws.com/"
+
+  CloudFrontUrl:
+    Description: "CloudFront Distribution URL"
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free CDN Hosting</title>
+  <link rel="shortcut icon" href="img/favicon.svg" type="image/x-icon">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://cdn.onedns.ch/attachment/1235206911368888380" rel="stylesheet">
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen">
+  <button id="links" class="fixed top-4 right-4 bg-gray-700 text-white py-2 px-4 rounded cursor-pointer border border-slate-500 hover:border-slate-100">
+    Show uploaded files
+  </button>  
+  <button id="reloadButton" class="hidden fixed top-4 left-4 bg-gray-700 text-white py-2 px-4 rounded cursor-pointer border border-slate-500 hover:border-slate-100">
+    Upload more files to CDN
+  </button>  
+  <button id="cliButton" class="fixed bottom-4 left-4 bg-gray-700 text-white py-2 px-4 rounded cursor-pointer border border-slate-500 hover:border-slate-100">
+    View CLI command
+  </button>  
+  <div id="cliModal" class="hidden fixed top-0 left-0 flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-50 z-50">
+    <div class="bg-white rounded-lg p-8">
+        <p class="text-xl font-semibold mb-4">CLI Command</p>
+        <p class="mb-8">Use this command to upload files via curl</p>
+        <div class="flex items-center mb-4">
+          <input type="text" id="filePathInput" placeholder="Enter the filename or file location you want to upload"
+              class="bg-gray-300 p-4 rounded-lg text-sm overflow-auto flex-grow placeholder-gray-700">
+        </div>      
+        <div class="flex items-center mb-4">
+            <pre id="curlCommand" class="max-w-2xl overflow-x-auto bg-gray-300 p-4 rounded-lg text-sm"></pre>
+            <button id="copyCommand" class="ml-2 bg-blue-500 text-white py-2 px-4 rounded cursor-pointer border border-slate-500 hover:border-slate-100">Copy</button>
+        </div>
+        <button id="closeModal" class="bg-gray-500 text-white py-2 px-4 rounded cursor-pointer border border-slate-500 hover:border-slate-100">Close</button>
+    </div>
+</div>
+  <div id="statusMessage" class="hidden fixed top-4 justify-center bg-gray-500 py-2 px-4 rounded shadow-md z-50">
+  </div>
+  <div id="upload-box" class="relative w-full max-w-lg">
+    <label for="fileInput" class="relative block w-full rounded-lg border-2 border-dashed border-gray-400 p-12 text-center hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer">
+      <svg id="upload-icon" class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+      </svg>
+      <span id="uploadText" class="mt-2 block text-sm font-semibold text-white">Click or drag and drop files to upload to cdn</span>
+      <input type="file" id="fileInput" multiple class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer">
+      <div class="mt-4">
+        <div id="loadingIcon" class="mt-4 text-center hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="animate-spin w-10 h-10 mx-auto text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+          <span class="block mt-2 text-sm font-semibold text-white">Uploading...</span>
+        </div>
+      </div>
+    </label>
+  </div>
+  <div class="bg-gray-900">
+    <div class="mx-auto max-w-screen-2xl">
+      <div class="mt-20 flow-root">
+        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <table id="cdnTable" class="min-w-full divide-y divide-gray-700 hidden">
+              <thead>
+                <tr>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0"></th>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0">
+                    File Name
+                  </th>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0">
+                    CDN Link
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="cdnTable" class="divide-y divide-gray-800"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/index.js"></script>
+</body>
+</html>

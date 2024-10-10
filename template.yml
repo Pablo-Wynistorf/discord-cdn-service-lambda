@@ -39,6 +39,12 @@ Resources:
             Path: /{proxy+}
             Method: ANY
 
+  DiscordCDNServiceLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${DiscordCDNServiceLambda}"
+      RetentionInDays: 3
+
 Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL for the default stage"

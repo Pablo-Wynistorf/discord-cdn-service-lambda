@@ -1,9 +1,9 @@
 const express = require('express');
 const path = require('path');
-const { Client, GatewayIntentBits } = require('discord.js');
 const multer = require('multer');
 const fs = require('fs');
 const cors = require('cors');
+const axios = require('axios');
 const serverless = require('serverless-http');
 require('dotenv').config();
 
@@ -12,25 +12,6 @@ const DISCORD_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 
 const app = express();
 const upload = multer({ dest: '/tmp/uploads/' });
-
-const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
-});
-
-client.login(DISCORD_BOT_TOKEN);
-
-// Log in Discord bot and handle message cache clearing
-client.on('ready', () => {
-    console.log(`Logged in as application: ${client.user.tag}!`);
-    setInterval(async () => {
-        try {
-            const channel = await client.channels.fetch(DISCORD_CHANNEL_ID);
-            await channel.messages.cache.clear();
-        } catch (err) {
-            console.error('Error clearing cache:', err);
-        }
-    }, 1 * 60 * 1000);
-});
 
 // Middleware
 app.use(express.json());
@@ -48,6 +29,22 @@ const checkFileUpload = async (req, res, next) => {
     next();
 };
 
+// Function to send files to Discord
+const sendFileToDiscord = async (filePath, fileName) => {
+    const url = `https://discord.com/api/v10/channels/${DISCORD_CHANNEL_ID}/messages`;
+    const formData = new FormData();
+    formData.append('files', fs.createReadStream(filePath), fileName);
+    
+    const response = await axios.post(url, formData, {
+        headers: {
+            'Authorization': `Bot ${DISCORD_BOT_TOKEN}`,
+            ...formData.getHeaders()
+        }
+    });
+    
+    return response.data.id;
+};
+
 // File upload endpoint
 app.post("/api/upload", checkFileUpload, upload.array("files"), async (req, res) => {
     try {
@@ -63,15 +60,10 @@ app.post("/api/upload", checkFileUpload, upload.array("files"), async (req, res)
             }
         }
 
-        const channel = await client.channels.fetch(DISCORD_CHANNEL_ID);
-        if (!channel) {
-            return res.status(500).send('Internal Server Error');
-        }
-
         const messageIds = [];
         for (const file of files) {
-            const message = await channel.send({ files: [{ attachment: file.path, name: file.originalname }] });
-            messageIds.push({ [file.originalname]: `${message.id}` });
+            const messageId = await sendFileToDiscord(file.path, file.originalname);
+            messageIds.push({ [file.originalname]: messageId });
             fs.unlink(file.path, err => {
                 if (err) {
                     console.error(`Error deleting file ${file.path}:`, err);
@@ -80,6 +72,7 @@ app.post("/api/upload", checkFileUpload, upload.array("files"), async (req, res)
         }
         res.json({ cdnLinks: messageIds });
     } catch (error) {
+        console.error('Error uploading files:', error);
         res.status(500).send('Internal Server Error');
     }
 });
@@ -88,22 +81,29 @@ app.post("/api/upload", checkFileUpload, upload.array("files"), async (req, res)
 app.get("/attachment/:messageId", async (req, res) => {
     try {
         const messageId = req.params.messageId;
-        const channel = await client.channels.fetch(DISCORD_CHANNEL_ID);
-        const message = await channel.messages.fetch(messageId);
-        if (!message || message.attachments.size === 0) {
+        const url = `https://discord.com/api/v10/channels/${DISCORD_CHANNEL_ID}/messages/${messageId}`;
+        
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Bot ${DISCORD_BOT_TOKEN}`
+            }
+        });
+
+        const message = response.data;
+        if (!message || message.attachments.length === 0) {
             return res.redirect('/');
         }
 
-        const attachment = message.attachments.first();
-        if (attachment.contentType.includes('text/html')) {
-            const response = await fetch(attachment.url);
-            const text = await response.text();
-            res.send(text);
+        const attachment = message.attachments[0];
+        if (attachment.content_type.includes('text/html')) {
+            const textResponse = await axios.get(attachment.url);
+            res.send(textResponse.data);
             return;
         }
 
         return res.redirect(attachment.url);
     } catch (err) {
+        console.error('Error retrieving attachment:', err);
         return res.redirect('/');
     }
 });

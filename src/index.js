@@ -3,6 +3,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const cors = require('cors');
+const FormData = require('form-data');
 const axios = require('axios');
 const serverless = require('serverless-http');
 require('dotenv').config();

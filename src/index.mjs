@@ -1,13 +1,13 @@
-const express = require('express');
-const path = require('path');
-const multer = require('multer');
-const fs = require('fs');
-const cors = require('cors');
-const FormData = require('form-data');
-const axios = require('axios');
-const serverless = require('serverless-http');
-require('dotenv').config();
+import express from 'express';
+import path from 'path';
+import multer from 'multer';
+import fs from 'fs';
+import cors from 'cors';
+import FormData from 'form-data';
+import axios from 'axios';
+import serverless from 'serverless-http';
 
+const CDN_URL = process.env.CDN_URL;
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const DISCORD_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 
@@ -16,11 +16,16 @@ const upload = multer({ dest: '/tmp/uploads/' });
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors(
+    {
+        origin: CDN_URL,
+        methods: ["*"],
+        allowedHeaders: ['*']
+    }
+));
 
 // Serve static files
-app.use('/', express.static(path.join(__dirname, 'public/home')));
-app.use('/links', express.static(path.join(__dirname, 'public/links')));
+app.use('/', express.static(path.join(__dirname, 'public')));
 
 const checkFileUpload = async (req, res, next) => {
     const requestSize = req.headers['content-length'];
@@ -64,7 +69,7 @@ app.post("/api/upload", checkFileUpload, upload.array("files"), async (req, res)
         const messageIds = [];
         for (const file of files) {
             const messageId = await sendFileToDiscord(file.path, file.originalname);
-            messageIds.push({ [file.originalname]: messageId });
+            messageIds.push({ [file.originalname]: CDN_URL + "/a/" + messageId });
             fs.unlink(file.path, err => {
                 if (err) {
                     console.error(`Error deleting file ${file.path}:`, err);
@@ -79,7 +84,7 @@ app.post("/api/upload", checkFileUpload, upload.array("files"), async (req, res)
 });
 
 // Attachment retrieval endpoint
-app.get("/attachment/:messageId", async (req, res) => {
+app.get("/a/:messageId", async (req, res) => {
     try {
         const messageId = req.params.messageId;
         const url = `https://discord.com/api/v10/channels/${DISCORD_CHANNEL_ID}/messages/${messageId}`;

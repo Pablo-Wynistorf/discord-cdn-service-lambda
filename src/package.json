@@ -1,21 +1,29 @@
 {
-  "name": "discord-cdn-service-lambda",
+  "name": "discord-cdn-service",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Free cdn solution",
+  "main": "index.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pablo-Wynistorf/discord-cdn-service-lambda.git"
+  },
   "author": "Pablo Wynistorf",
   "license": "MIT",
-  "description": "",
+  "bugs": {
+    "url": "https://github.com/Pablo-Wynistorf/discord-cdn-service-lambda/issues"
+  },
+  "homepage": "https://github.com/Pablo-Wynistorf/discord-cdn-service-lambda#readme",
   "dependencies": {
     "axios": "^1.7.7",
     "cors": "^2.8.5",
-    "discord.js": "^14.16.2",
-    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "form-data": "^4.0.1",
+    "fs": "^0.0.1-security",
     "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
     "serverless-http": "^3.2.0"
   }
 }

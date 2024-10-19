@@ -28,7 +28,7 @@ AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
 
 read -p "Enter your Discord Bot Token: " DISCORD_BOT_TOKEN
 read -p "Enter your Discord Channel ID: " DISCORD_CHANNEL_ID
-
+read -p "Enter your desirec CDN URL eg. https://cdn.example.com : " CDN_URL
 
 # Install node modules
 echo "Installing Node.js dependencies..."
@@ -53,4 +53,4 @@ sam deploy --template-file template.yml \
   --capabilities CAPABILITY_IAM \
   --s3-bucket "$S3_BUCKET_NAME" \
   --region "$AWS_DEFAULT_REGION" \
-  --parameter-overrides DiscordBotToken=$DISCORD_BOT_TOKEN DiscordChannelId=$DISCORD_CHANNEL_ID
+  --parameter-overrides DiscordBotToken=$DISCORD_BOT_TOKEN DiscordChannelId=$DISCORD_CHANNEL_ID CDNUrl=$CDN_URL

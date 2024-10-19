@@ -9,6 +9,9 @@ Parameters:
   DiscordChannelId:
     Type: String
     Description: "Discord Channel ID"
+  CDNUrl:
+    Type: String
+    Description: "CDN URL"
 
 Resources:
   DiscordCDNServiceLambdaAPI:
@@ -27,6 +30,7 @@ Resources:
         Variables:
           DISCORD_BOT_TOKEN: !Ref DiscordBotToken
           DISCORD_CHANNEL_ID: !Ref DiscordChannelId
+          CDN_URL: !Ref CDNUrl
       MemorySize: 128
       Timeout: 30
       Policies:

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Free CDN Hosting</title>
+    <link rel="shortcut icon" href="img/favicon.svg" type="image/x-icon" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gray-900 flex flex-col items-center justify-center min-h-screen p-4"
+  >
+    <button
+      id="cliButton"
+      class="fixed top-4 left-4 bg-purple-600 hover:bg-purple-500 text-white py-1.5 px-2 rounded-lg transition border border-transparent"
+    >
+      View CLI command
+    </button>
+    <button
+      id="toggleTableButton"
+      class="fixed top-4 right-4 bg-blue-600 hover:bg-blue-500 text-white py-1.5 px-2 rounded-lg transition border border-transparent"
+    >
+      Show Uploaded Files
+    </button>
+
+    <div
+      id="cliModal"
+      class="hidden fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50 p-4"
+    >
+      <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <p class="text-xl font-semibold mb-2">CLI Command</p>
+        <p class="mb-4 text-gray-700">
+          Use this command to upload files via curl:
+        </p>
+        <div class="mb-4">
+          <input
+            type="text"
+            id="filePathInput"
+            placeholder="Enter the filename or file location to upload"
+            class="bg-gray-100 p-2 rounded-lg w-full text-sm placeholder-gray-600 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+        <div class="flex items-center space-x-2 mb-4">
+          <pre
+            id="curlCommand"
+            class="bg-gray-100 p-2 rounded-lg text-sm overflow-x-auto flex-grow border"
+          ></pre>
+          <button
+            id="copyCommand"
+            class="bg-blue-500 hover:bg-blue-400 text-white py-2 px-4 rounded-lg transition border border-transparent"
+          >
+            Copy
+          </button>
+        </div>
+        <button
+          id="closeModal"
+          class="bg-gray-400 hover:bg-gray-300 text-white py-2 px-4 rounded-lg transition border border-transparent"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="statusMessage"
+      class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 bg-gray-700 py-2 px-4 rounded shadow-md z-50 text-white"
+    ></div>
+
+    <div id="upload-box" class="relative w-full max-w-lg my-8">
+      <label
+        for="fileInput"
+        class="relative block w-full rounded-lg border-2 border-dashed border-gray-500 p-12 text-center hover:border-gray-400 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+        <svg
+          id="upload-icon"
+          class="mx-auto h-12 w-12 text-gray-400"
+          stroke="currentColor"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
+          />
+        </svg>
+        <span id="uploadText" class="mt-2 block text-sm font-medium text-white">
+          Click or drag and drop files to upload
+        </span>
+        <input
+          type="file"
+          id="fileInput"
+          multiple
+          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        />
+        <div id="loadingIcon" class="mt-4 hidden">
+          <svg
+            class="animate-spin w-8 h-8 mx-auto text-blue-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+            />
+          </svg>
+          <span class="block mt-2 text-sm font-medium text-white">Uploading...</span>
+        </div>
+        <div id="uploadProgress" class="hidden mt-4">
+          <div class="bg-gray-600 rounded h-2">
+            <div id="progressBar" class="bg-blue-500 h-full rounded" style="width: 0%;"></div>
+          </div>
+          <span id="progressText" class="text-white text-sm mt-1">0%</span>
+        </div>
+      </label>
+    </div>
+    
+
+    <div class="bg-gray-900 w-full">
+      <div class="mx-auto max-w-screen-xl">
+        <div class="mt-2 overflow-x-auto">
+          <div
+            class="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+          >
+            <table
+              id="cdnTable"
+              class="min-w-full divide-y divide-gray-700 hidden"
+            >
+              <thead>
+                <tr>
+                  <th
+                    class="py-3 px-4 text-left text-sm font-semibold text-white"
+                  ></th>
+                  <th
+                    class="py-3 px-4 text-left text-sm font-semibold text-white"
+                  >
+                    File Name
+                  </th>
+                  <th
+                    class="py-3 px-4 text-left text-sm font-semibold text-white"
+                  >
+                    CDN Link
+                  </th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="js/index.js"></script>
+  </body>
+</html>

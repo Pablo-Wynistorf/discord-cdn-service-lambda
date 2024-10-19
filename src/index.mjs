@@ -6,6 +6,10 @@ import cors from 'cors';
 import FormData from 'form-data';
 import axios from 'axios';
 import serverless from 'serverless-http';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const CDN_URL = process.env.CDN_URL;
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
@@ -14,18 +18,14 @@ const DISCORD_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 const app = express();
 const upload = multer({ dest: '/tmp/uploads/' });
 
-// Middleware
 app.use(express.json());
-app.use(cors(
-    {
-        origin: CDN_URL,
-        methods: ["*"],
-        allowedHeaders: ['*']
-    }
-));
+app.use(cors({
+    origin: CDN_URL,
+    methods: ["*"],
+    allowedHeaders: ['*']
+}));
 
-// Serve static files
-app.use('/', express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const checkFileUpload = async (req, res, next) => {
     const requestSize = req.headers['content-length'];
@@ -114,4 +114,4 @@ app.get("/a/:messageId", async (req, res) => {
     }
 });
 
-exports.handler = serverless(app);
+export const handler = serverless(app);

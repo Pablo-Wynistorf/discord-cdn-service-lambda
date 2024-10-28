@@ -12,12 +12,22 @@ Parameters:
   CDNUrl:
     Type: String
     Description: "CDN URL"
+  RawCdnUrl:
+    Type: String
+    Description: "Raw CDN URL"
+  CdnUrlCertificateArn:
+    Type: String
+    Description: "CDN URL Certificate ARN"
 
 Resources:
   DiscordCDNServiceLambdaAPI:
     Type: AWS::Serverless::HttpApi
     Properties:
       Name: DiscordCDNServiceLambda
+      Domain:
+        DomainName: !Ref RawCdnUrl
+        CertificateArn: !Ref CdnUrlCertificateArn
+        EndpointConfiguration: REGIONAL
 
   DiscordCDNServiceLambda:
     Type: AWS::Serverless::Function
@@ -48,8 +58,3 @@ Resources:
     Properties:
       LogGroupName: !Sub "/aws/lambda/${DiscordCDNServiceLambda}"
       RetentionInDays: 3
-
-Outputs:
-  ApiUrl:
-    Description: "API Gateway endpoint URL for the default stage"
-    Value: !Sub "https://${DiscordCDNServiceLambdaAPI}.execute-api.${AWS::Region}.amazonaws.com/"

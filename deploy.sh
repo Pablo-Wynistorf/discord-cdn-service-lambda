@@ -44,10 +44,6 @@ read -p "Enter the issued certificate ARN for the CDN URL in the same region as 
 
 CERTIFICATE_DETAILS=$(aws acm describe-certificate --certificate-arn "$CERTIFICATE_ARN" --region "$AWS_DEFAULT_REGION" 2>/dev/null)
 
-if [ $? -ne 0 ]; then
-  echo "Certificate ARN is invalid."
-  exit 1
-fi
 
 VALIDATION_STATUS=$(echo "$CERTIFICATE_DETAILS" | grep -o '"ValidationStatus": *"[^"]*"' | sed 's/"ValidationStatus": *//;s/"//g')
 
